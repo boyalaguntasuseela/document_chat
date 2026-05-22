@@ -1,0 +1,4 @@
+[2026-05-19 15:18:19,559] INFO __main__ (line: 42)- I am calling from Customlogger
+[2026-05-19 15:18:35,518] INFO __main__ (line: 42)- I am calling from Customlogger
+[2026-05-19 15:19:04,398] INFO __main__ (line: 42)- I am calling from Customlogger
+[2026-05-19 15:19:12,466] INFO __main__ (line: 42)- I am calling from Customlogger
