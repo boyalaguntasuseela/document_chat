@@ -1,41 +1,101 @@
 import os
 import logging
 from datetime import datetime
-class CustomLogger():
+import logging
+import structlog
+
+
+
+
+class CustomLogger:
     def __init__(self):
-        self.Log_Folder = os.path.join(os.getcwd(),"logs")
-        os.makedirs(self.LOG_Folder)
-        Log_File_Name = f"{datetime.now().strftime("%m_%d_%y")}.log"
-        Log_file_Path = os.path.join(Log_Folder,Log_File_Name)
+        self.log_folder = os.path.join(os.getcwd(), "logs")
+
+        # Create logs directory if it doesn't exist
+        os.makedirs(self.log_folder, exist_ok=True)
+
+        # Create log file name
+        log_file_name = f"{datetime.now().strftime('%m_%d_%y')}.log"
+
+        # Full log file path
+        log_file_path = os.path.join(self.log_folder, log_file_name)
+
+        # Configure logging
         logging.basicConfig(
-            filename= Log_file_Path,
-            format = "[%(asctime)s] %(levelname)s %(name)s (line: %(lineno)d)- %(message)s",
-            level = logging.INFO
+            filename=log_file_path,
+            format="[%(asctime)s] %(levelname)s %(name)s (line: %(lineno)d) - %(message)s",
+            level=logging.INFO
         )
 
-    def getLogger(self):
-        File_handler = logging.Filehandler(self.Log_file_Path)
-        File_handler.setlevel(logging.INFO)
-        File_handler.setFormatter(logging.Formatter "%(message)s")
+        self.logger = logging.getLogger(__name__)
 
-        #for console
+    def get_logger(self):
+        return self.logger
+   
 
-        console_handler = logging.StreamHandler()
-        console_handler.setLevel(logging.INFO)
-        console_handler.setFormatter (logging.Formatter "%(message)s")
 
-        logging.basicConfig (
-            Level = logging.INFO
-            format = "%(message)s,"
-            handlers=[File_handler,console_handler]
-        
-        return_logger = logging.getlogger(__name__))
+def getLogger(self):
+
+    # File handler
+    file_handler = logging.FileHandler(self.log_file_path)
+    file_handler.setLevel(logging.INFO)
+    file_handler.setFormatter(logging.Formatter("%(message)s"))
+
+    # Console handler
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.INFO)
+    console_handler.setFormatter(logging.Formatter("%(message)s"))
+ # Create logger
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.INFO)
+
+    # Avoid duplicate handlers
+    if not logger.handlers:
+        logger.addHandler(file_handler)
+        logger.addHandler(console_handler)
+
+    return logger
+
+
+#customlogger to structlog implemetation
+
+import structlog
+
+
+structlog.configure(
+    processors=[
+        structlog.processors.TimeStamper(
+            fmt="iso",
+            utc=True,
+            key="timestamp"
+        ),
+
+        structlog.processors.add_log_level,
+
+        structlog.processors.EventRenamer(
+            to="event"
+        ),
+
+        structlog.processors.JSONRenderer()
+    ],
+
+    logger_factory=structlog.stdlib.LoggerFactory(),
+
+    cache_logger_on_first_use=True
+)
+
+
+
+
+
 
 if __name__ == "__main__":
-    logger_obj = CustomLogger (
-        logger_obj.get_logger()
-        logger.info("I am calling from Customlogger")
-    )
+
+    logger_obj = CustomLogger()
+
+    logger = logger = logger_obj.get_logger()
+
+    logger.info("I am calling from CustomLogger")
 
 
 
